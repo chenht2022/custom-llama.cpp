@@ -257,6 +257,8 @@ llama_context::llama_context(
             model.params.split_mode == LLAMA_SPLIT_MODE_LAYER &&
             cparams.offload_kqv;
 
+        pipeline_parallel = false; // [MODIFIED] disable pipeline parallelism
+
         // pipeline parallelism requires support for async compute and events in all devices
         if (pipeline_parallel) {
             for (auto & backend : backends) {

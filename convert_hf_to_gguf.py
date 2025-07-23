@@ -2348,6 +2348,21 @@ class Qwen2MoeModel(Model):
     _experts: list[dict[str, Tensor]] | None = None
 
     def modify_tensors(self, data_torch: Tensor, name: str, bid: int | None) -> Iterable[tuple[str, Tensor]]:
+
+        # [MODIFIED] to rewrite layer_id
+        def replace_number_in_string(input_string, offset):
+            # Find all numbers in the string
+            numbers = re.findall(r'\d+', input_string)
+            # Assuming there is at least one number, replace the first one found
+            if numbers:
+                original_number = numbers[0]
+                new_number = int(original_number) * 2 + offset
+                # Replace the original number with the new number in the string
+                output_string = re.sub(original_number, str(new_number), input_string, 1)
+                return output_string
+            else:
+                return input_string
+            
         # process the experts separately
         if name.find("experts") != -1:
             n_experts = self.hparams["num_experts"]
@@ -2374,14 +2389,14 @@ class Qwen2MoeModel(Model):
 
                     merged_name = f"model.layers.{bid}.mlp.experts.{w_name}.weight"
 
-                    new_name = self.map_tensor_name(merged_name)
+                    new_name = replace_number_in_string(self.map_tensor_name(merged_name), 1)
 
                     tensors.append((new_name, data_torch))
                 return tensors
             else:
                 return []
 
-        return [(self.map_tensor_name(name), data_torch)]
+        return [(replace_number_in_string(self.map_tensor_name(name), 0), data_torch)]
 
     def prepare_tensors(self):
         super().prepare_tensors()
@@ -4364,6 +4379,21 @@ class DeepseekV2Model(Model):
     _experts: list[dict[str, Tensor]] | None = None
 
     def modify_tensors(self, data_torch: Tensor, name: str, bid: int | None) -> Iterable[tuple[str, Tensor]]:
+
+        # [MODIFIED] to rewrite layer_id
+        def replace_number_in_string(input_string, offset):
+            # Find all numbers in the string
+            numbers = re.findall(r'\d+', input_string)
+            # Assuming there is at least one number, replace the first one found
+            if numbers:
+                original_number = numbers[0]
+                new_number = int(original_number) * 2 + offset
+                # Replace the original number with the new number in the string
+                output_string = re.sub(original_number, str(new_number), input_string, 1)
+                return output_string
+            else:
+                return input_string
+            
         # rename e_score_correction_bias tensors
         if name.endswith("e_score_correction_bias"):
             name = name.replace("e_score_correction_bias", "e_score_correction.bias")
@@ -4400,14 +4430,14 @@ class DeepseekV2Model(Model):
 
                     merged_name = f"model.layers.{bid}.mlp.experts.{w_name}.weight"
 
-                    new_name = self.map_tensor_name(merged_name)
+                    new_name = replace_number_in_string(self.map_tensor_name(merged_name), 1)
 
                     tensors.append((new_name, data_torch))
                 return tensors
             else:
                 return []
 
-        return [(self.map_tensor_name(name), data_torch)]
+        return [(replace_number_in_string(self.map_tensor_name(name), 0), data_torch)]
 
     def prepare_tensors(self):
         super().prepare_tensors()

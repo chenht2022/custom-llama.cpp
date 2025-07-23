@@ -104,7 +104,8 @@ void llm_graph_input_out_ids::set_input(const llama_ubatch * ubatch) {
         //GGML_ASSERT(out_ids && "every model that can must skip unused outputs");
 
         if (!out_ids) {
-            LLAMA_LOG_WARN("%s: 'out_ids' is not created\n", __func__);
+            // [MODIFIED] skip cause bug
+            // LLAMA_LOG_WARN("%s: 'lctx.inp_out_ids' is not created\n", __func__);
         } else {
             const int64_t n_tokens = ubatch->n_tokens;
 

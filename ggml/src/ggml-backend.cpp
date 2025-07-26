@@ -343,8 +343,11 @@ bool ggml_backend_supports_buft(ggml_backend_t backend, ggml_backend_buffer_type
 }
 
 bool ggml_backend_offload_op(ggml_backend_t backend, const struct ggml_tensor * op) {
+    // [MODIFIED] never offload
+    return false;
     return ggml_backend_dev_offload_op(backend->device, op);
 }
+
 
 ggml_backend_dev_t ggml_backend_get_device(ggml_backend_t backend) {
     return backend->device;
